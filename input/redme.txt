@@ -1,0 +1,1 @@
+Esta carpeta va a ser para poner los archivos de entrada. Los yapar/yalex que tednrán las gramáticas

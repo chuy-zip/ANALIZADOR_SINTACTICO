@@ -2,7 +2,7 @@ class ActionGotoTable():
     def __init__(self, table_dict):
         self.table = table_dict
 
-    def Action(self, State: int, Terminal: str) -> str:
+    def Action(self, State: str, Terminal: str) -> str:
         table = self.table
         
         print(f"\nSearching Action on table with state '{State}' for Terminal '{Terminal}'")
@@ -14,7 +14,7 @@ class ActionGotoTable():
 
         return result
     
-    def Goto(self, State: int, NonTerminal: str) -> int:
+    def Goto(self, State: str, NonTerminal: str) -> int:
 
         table = self.table
 

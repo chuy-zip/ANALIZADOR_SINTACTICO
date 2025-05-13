@@ -1,0 +1,9 @@
+[
+  { "left": "E'", "prod": ["E"], "dot": 0 },     
+  { "left": "E", "prod": ["E", "+", "T"], "dot": 0 }, 
+  { "left": "E", "prod": ["T"], "dot": 0 },      
+  { "left": "T", "prod": ["T", "*", "F"], "dot": 0 },  
+  { "left": "T", "prod": ["F"], "dot": 0 },      
+  { "left": "F", "prod": ["(", "E", ")"], "dot": 0 }, 
+  { "left": "F", "prod": ["id"], "dot": 0 }    
+]
