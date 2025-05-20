@@ -1,3 +1,12 @@
+"""
+Autores:
+- Nelson García Bravatti 
+- Ricardo Chuy
+- Joaquín Puente
+
+Diseño de Lenguajes de Programación
+"""
+
 class ActionGotoTable():
     def __init__(self, table_dict):
         self.table = table_dict
