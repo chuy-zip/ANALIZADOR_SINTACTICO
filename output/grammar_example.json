@@ -1,14 +1,5 @@
 {
-  "expression": [
-    "expression PLUS term",
-    "term"
-  ],
-  "term": [
-    "term TIMES factor",
-    "factor"
-  ],
-  "factor": [
-    "LPAREN expression RPAREN",
-    "ID"
-  ]
+  "E": ["E + T", "T"],
+  "T": ["T * F", "F"],
+  "F": ["( E )", "id"]
 }

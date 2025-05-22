@@ -1,0 +1,1 @@
+En esta carpeta es que deben poner el output de sus programas, la carpeta de output sera para los ejemplos y lo mejor es no modificarlos.
