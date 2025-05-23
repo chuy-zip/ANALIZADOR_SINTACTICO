@@ -11,3 +11,6 @@ print(grammar)
 print(transition_table)
 Automata = AutomataLR(transition_table, grammar)
 
+print(Automata.action_goto_table.Action("0", "id"))
+print(Automata.action_goto_table.Goto("0",'E'))
+

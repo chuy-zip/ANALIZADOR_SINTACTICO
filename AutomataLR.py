@@ -124,21 +124,33 @@ class AutomataLR:
                     left_symbol = item["left"]
                     production = (left_symbol, item["prod"])
                     
-                    # Buscar el numero de la prod
+                    # Buscar el numero de la producción
                     prod_num = next(
                         (num for num, prod in self.production_numbers.items() if prod == production),
                         None
                     )
                     if prod_num is not None:
                         for terminal in self.first_follow_table[left_symbol]["follow"]:
-                            if action_goto_table[state_num]["action"][terminal] == "":
-                                action_goto_table[state_num]["action"][terminal] = f"r{prod_num}"
+                            current_action = action_goto_table[state_num]["action"][terminal]
+                            new_action = f"r{prod_num}"
+                            
+                            if current_action == "":
+                                action_goto_table[state_num]["action"][terminal] = new_action
                             else:
-                                print(f"Conflicto en state {state_num}, terminal {terminal}: {action_goto_table[state_num]['action'][terminal]} vs r{prod_num}")
-            print("Tabla ACTION/GOTO completada:")
-            print(action_goto_table)
-
-        return action_goto_table
+                                # Detección del tipo de conflicto
+                                if current_action.startswith('s') and new_action.startswith('r'):
+                                    conflict_type = "Shift-Reduce"
+                                elif current_action.startswith('r') and new_action.startswith('r'):
+                                    conflict_type = "Reduce-Reduce"
+                                else:
+                                    conflict_type = "Conflicto desconocido"
+                                
+                                print(f"\n❌ {conflict_type} en state {state_num}, terminal '{terminal}':")
+                                print(f" - Acción existente: {current_action}")
+                                print(f" - Nueva acción: {new_action}")
+                                print(f" - Producción en conflicto: {left_symbol} -> {' '.join(item['prod'])}")
+                                
+        return ActionGotoTable(action_goto_table)
     
     #Modulo 5
     def LR_parsing(self, tokenlist):
