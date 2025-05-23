@@ -8,7 +8,27 @@ class AutomataLR:
         self.non_terminals: set = set(original_grammar.keys())
         self.terminals: set = self.get_terminals()
         self.first_follow_table: dict = self.compute_first_follow()
+        self.production_numbers = self.number_productions()
         self.action_goto_table: ActionGotoTable = self.build_action_goto_table()
+        
+    def number_productions(self):
+        productions_tuple = []
+
+        for left, productions in self.original_grammar.items():
+            for prod in productions:
+                print(productions)
+                productions_tuple.append((left, prod.split()))  # Ej: ("E", ["E", "+", "T"])
+
+        print(f"producciones: {productions_tuple}")
+
+        numbered_productions = {}
+        for i, prod in enumerate(productions_tuple):
+
+            numbered_productions[i + 1] = prod
+
+        print(numbered_productions)
+
+        return numbered_productions
     
     def get_terminals(self):
         terminals = set()
@@ -82,7 +102,43 @@ class AutomataLR:
                     action_goto_table[state_number]["goto"][transition_symbol] = next_state_number
         print(action_goto_table)
 
-        return
+        # llenar las acciones (shift/accept/reduce) 
+        for state_name, state_data in self.automata_table.items():
+            state_num = state_name.replace("I", "")
+            
+            #SHIFT (para terminales)
+            for terminal, target_state in state_data["transitions"].items():
+                if terminal in self.terminals:  
+                    target_num = target_state.replace("I", "")
+                    action_goto_table[state_num]["action"][terminal] = f"s{target_num}"
+
+           #ACCEPT (ítem E' → E·)
+            for item in state_data["items"]:
+                if item["left"] == "E'" and item["dot"] == len(item["prod"]):  # E' → E·
+                    action_goto_table[state_num]["action"]["$"] = "acc"
+                    break  # Solo hay un ítem E' → E· por estado
+
+            #REDUCE (para ítems con punto al final, excluyendo E')
+            for item in state_data["items"]:
+                if item["dot"] == len(item["prod"]) and item["left"] != "E'":
+                    left_symbol = item["left"]
+                    production = (left_symbol, item["prod"])
+                    
+                    # Buscar el numero de la prod
+                    prod_num = next(
+                        (num for num, prod in self.production_numbers.items() if prod == production),
+                        None
+                    )
+                    if prod_num is not None:
+                        for terminal in self.first_follow_table[left_symbol]["follow"]:
+                            if action_goto_table[state_num]["action"][terminal] == "":
+                                action_goto_table[state_num]["action"][terminal] = f"r{prod_num}"
+                            else:
+                                print(f"Conflicto en state {state_num}, terminal {terminal}: {action_goto_table[state_num]['action'][terminal]} vs r{prod_num}")
+            print("Tabla ACTION/GOTO completada:")
+            print(action_goto_table)
+
+        return action_goto_table
     
     #Modulo 5
     def LR_parsing(self, tokenlist):
@@ -95,7 +151,7 @@ class AutomataLR:
 
     #Obtiene las producciones para un estado dado del autómata.
     def get_state_items(self, state):
-        return self.automata_table[state]["productions"]
+        return self.automata_table[state]["items"]
 
     #Obtiene el conjunto FIRST para un simbolo gramatical.
     def get_first_set(self, symbol):

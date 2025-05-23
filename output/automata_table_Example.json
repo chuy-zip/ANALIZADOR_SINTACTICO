@@ -72,7 +72,7 @@
       { "left": "F", "prod": ["(", "E", ")"], "dot": 2 },
       { "left": "E", "prod": ["E", "+", "T"], "dot": 1 }
     ],
-    "transitions": { "+": "I6" }
+    "transitions": { "+": "I6", ")": "I11"}
   },
   "I9": {
     "items": [
