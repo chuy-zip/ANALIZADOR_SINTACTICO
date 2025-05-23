@@ -22,7 +22,6 @@ class AutomataLR:
                     # si no es un non_ter ni epsilon,es un terminal
                     if symbol not in self.non_terminals and symbol != 'ε':
                         terminals.add(symbol)
-
         return terminals
     
     def compute_first_follow(self):
@@ -47,6 +46,42 @@ class AutomataLR:
 
     def build_action_goto_table(self):
         print("WIP")
+
+        action_goto_table = {}
+        # generando la tabla
+        for state in self.automata_table.keys():
+            state_number = state.replace("I","")
+            action_goto_table[state_number] = { "action": {}, "goto": {}}
+
+            for terminal in self.terminals:
+                action_goto_table[state_number]["action"][terminal] = ""
+            
+            # el simbolo $ no es un no terminal original de la gramatica pero es necesario para el parsing
+            action_goto_table[state_number]["action"]["$"] = ""
+                
+            for non_terminal in self.non_terminals:
+                action_goto_table[state_number]["goto"][non_terminal] = ""
+        
+        
+        # haciendo el goto
+
+        #por cada estado
+        for state in self.automata_table.keys():
+
+            state_number = state.replace("I","")
+            state_transitions = self.get_state_transitions(state)
+
+            #ver todas las transiciones
+            for transition_symbol, next_state in state_transitions.items():
+
+                # si el simbolo de transicion es no terminal
+                if transition_symbol in self.non_terminals:
+                    next_state_number = next_state.replace("I","")
+
+                    # la interseccion entre el no terminal y el estado (en goto) es el numero del siguiente estado
+                    action_goto_table[state_number]["goto"][transition_symbol] = next_state_number
+        print(action_goto_table)
+
         return
     
     #Modulo 5
@@ -56,16 +91,16 @@ class AutomataLR:
 
     #Obtiene las transiciones para un estado dado del autómata.
     def get_state_transitions(self, state):
-        pass
+        return self.automata_table[state]["transitions"]
 
     #Obtiene las producciones para un estado dado del autómata.
-    def get_state_productions(self, state):
-        pass
+    def get_state_items(self, state):
+        return self.automata_table[state]["productions"]
 
     #Obtiene el conjunto FIRST para un simbolo gramatical.
     def get_first_set(self, symbol):
-        pass
+        return self.first_follow_table[symbol]["first"]
 
     #Obtiene el conjunto FOLLOW para un simbolo gramatical.
     def get_follow_set(self, symbol):
-        pass
+        return self.first_follow_table[symbol]["follow"]
