@@ -1,0 +1,1 @@
+En teorpría en esta carpeta tenemos que poner las listas de tokens que da el proyecto 1. Pero creo que los archivos de prueba aún no los ha compartido bidkar. En el proyecto 1 los los archivos donde ecnontrabamos tokens eran demasiado largos.
