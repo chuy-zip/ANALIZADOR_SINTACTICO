@@ -1,22 +1,22 @@
 [
     {
-        "TokenName": "NUMBER",
-        "Lexema": "5"
+        "TokenName": "ID",
+        "Lexema": "var1"
     },
     {
         "TokenName": "PLUS",
         "Lexema": "+"
     },
     {
-        "TokenName": "NUMBER",
-        "Lexema": "5"
+        "TokenName": "ID",
+        "Lexema": "var2"
     },
     {
         "TokenName": "TIMES",
         "Lexema": "*"
     },
     {
-        "TokenName": "NUMBER",
-        "Lexema": "5"
+        "TokenName": "ID",
+        "Lexema": "var3"
     }
 ]
