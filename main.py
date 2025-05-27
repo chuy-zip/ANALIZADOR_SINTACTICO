@@ -12,17 +12,20 @@ import json
 from readYalp import YalpParser
 
 
+
 def main():
     print("Generador de analizador sintáctico")
 
-    yalp_files = ["input/slr-1.yalp", "input/slr-2.yalp", "input/slr-3.yalp", "input/slr-4.yalp"]
-
-    option = 0
+    yalp_files = [
+        "input/slr-1.yalp",
+        "input/slr-2.yalp",
+        "input/slr-3.yalp",
+        "input/slr-4.yalp"
+    ]
 
     print("Elige un archivo seleccinando el numero correspondiente:")
-
     for idx, name in enumerate(yalp_files, 1):
-            print(f"{idx}. {name}")
+        print(f"{idx}. {name}")
 
     try:
         option = int(input("> "))
@@ -31,30 +34,13 @@ def main():
         print("Opción inválida.")
         return
 
-    parser = YalpParser(filename)
-    json_file, productions = parser.to_json(output_dir='output', out_name='grammar_example.json')
-    print(f"Archivo JSON generado: {json_file}")
+    parser = YalpParser(filename, option)
+    productions, au_grammar = parser.to_json()
+    print(f"\nArchivo grammar.json generado en real_output/\n")
     print(json.dumps(productions, ensure_ascii=False, indent=2))
-
-
+    print(f"\nArchivo augmented_grammar.json generado en real_output/\n")
+    print(json.dumps(au_grammar, ensure_ascii=False, indent=2))
+    
 
 if __name__ == '__main__':
     main()
-
-
-# from ActionGotoTable import ActionGotoTable
-# import json
-
-# data = {}
-
-# with open('ActionGotoTableExample.json', 'r') as file:
-#     data = json.load(file)
-
-# action_goto_table = ActionGotoTable(data)
-
-# state = "5"
-# terminal = "*"
-# nonTerminal = "E"
-
-# value1 = action_goto_table.Action(state, terminal)
-# value2 = action_goto_table.Goto(state, nonTerminal)
