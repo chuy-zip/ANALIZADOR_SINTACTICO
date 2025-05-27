@@ -2,27 +2,33 @@
     "tokens": [
         {
             "nombre": "WHITESPACE",
-            "regex": "( |\t|\n)+"
+            "regex": "( |\t|\n)+",
+            "lexema": "ws"
         },
         {
             "nombre": "NUMBER",
-            "regex": "(0|1|2|3|4|5|6|7|8|9)+(.(0|1|2|3|4|5|6|7|8|9)+)?(E(\\+|-)?(0|1|2|3|4|5|6|7|8|9)+)?"
+            "regex": "(0|1|2|3|4|5|6|7|8|9)+(.(0|1|2|3|4|5|6|7|8|9)+)?(E(\\+|-)?(0|1|2|3|4|5|6|7|8|9)+)?",
+            "lexema": "number"
         },
         {
             "nombre": "PLUS",
-            "regex": "\\+"
+            "regex": "\\+",
+            "lexema": "+"
         },
         {
             "nombre": "TIMES",
-            "regex": "\\*"
+            "regex": "\\*",
+            "lexema": "*"
         },
         {
             "nombre": "LPAREN",
-            "regex": "\\("
+            "regex": "\\(",
+            "lexema": "("
         },
         {
             "nombre": "RPAREN",
-            "regex": "\\)"
+            "regex": "\\)",
+            "lexema": ")"
         }
     ]
 }
