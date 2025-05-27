@@ -1,0 +1,370 @@
+{
+  "I0": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "E",
+          "+",
+          "T"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "E",
+        "prod": [
+          "T"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "E'",
+        "prod": [
+          "E"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "id"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "F"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 0
+      }
+    ],
+    "transitions": {
+      "E": "I1",
+      "F": "I2",
+      "(": "I3",
+      "T": "I4",
+      "id": "I5"
+    }
+  },
+  "I1": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "E",
+          "+",
+          "T"
+        ],
+        "dot": 1
+      },
+      {
+        "left": "E'",
+        "prod": [
+          "E"
+        ],
+        "dot": 1
+      }
+    ],
+    "transitions": {
+      "+": "I6"
+    }
+  },
+  "I2": {
+    "items": [
+      {
+        "left": "T",
+        "prod": [
+          "F"
+        ],
+        "dot": 1
+      }
+    ],
+    "transitions": {}
+  },
+  "I3": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "E",
+          "+",
+          "T"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "E",
+        "prod": [
+          "T"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "id"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 1
+      },
+      {
+        "left": "T",
+        "prod": [
+          "F"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 0
+      }
+    ],
+    "transitions": {
+      "E": "I7",
+      "F": "I2",
+      "(": "I3",
+      "T": "I4",
+      "id": "I5"
+    }
+  },
+  "I4": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "T"
+        ],
+        "dot": 1
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 1
+      }
+    ],
+    "transitions": {
+      "*": "I8"
+    }
+  },
+  "I5": {
+    "items": [
+      {
+        "left": "F",
+        "prod": [
+          "id"
+        ],
+        "dot": 1
+      }
+    ],
+    "transitions": {}
+  },
+  "I6": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "E",
+          "+",
+          "T"
+        ],
+        "dot": 2
+      },
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "id"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "F"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 0
+      }
+    ],
+    "transitions": {
+      "T": "I9",
+      "F": "I2",
+      "(": "I3",
+      "id": "I5"
+    }
+  },
+  "I7": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "E",
+          "+",
+          "T"
+        ],
+        "dot": 1
+      },
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 2
+      }
+    ],
+    "transitions": {
+      "+": "I6",
+      ")": "I10"
+    }
+  },
+  "I8": {
+    "items": [
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "id"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 2
+      }
+    ],
+    "transitions": {
+      "F": "I11",
+      "(": "I3",
+      "id": "I5"
+    }
+  },
+  "I9": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "E",
+          "+",
+          "T"
+        ],
+        "dot": 3
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 1
+      }
+    ],
+    "transitions": {
+      "*": "I8"
+    }
+  },
+  "I10": {
+    "items": [
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 3
+      }
+    ],
+    "transitions": {}
+  },
+  "I11": {
+    "items": [
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 3
+      }
+    ],
+    "transitions": {}
+  }
+}

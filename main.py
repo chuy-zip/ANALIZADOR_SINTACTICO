@@ -10,6 +10,7 @@ Diseño de Lenguajes de Programación
 import os
 import json
 from readYalp import YalpParser
+import subprocess
 
 
 
@@ -37,9 +38,15 @@ def main():
     parser = YalpParser(filename, option)
     productions, au_grammar = parser.to_json()
     print(f"\nArchivo grammar.json generado en real_output/\n")
-    print(json.dumps(productions, ensure_ascii=False, indent=2))
+    #print(json.dumps(productions, ensure_ascii=False, indent=2))
+
     print(f"\nArchivo augmented_grammar.json generado en real_output/\n")
-    print(json.dumps(au_grammar, ensure_ascii=False, indent=2))
+    #print(json.dumps(au_grammar, ensure_ascii=False, indent=2))
+
+    aug_path = os.path.join('real_output', 'augmented_grammar.json')
+    # invocar automataTable.py para construir la tabla
+    subprocess.run(['python', 'automataTable.py', aug_path])
+    print('automaton.json generado en real_output/')
     
 
 if __name__ == '__main__':
