@@ -154,8 +154,102 @@ class AutomataLR:
     
     #Modulo 5
     def LR_parsing(self, tokenlist):
-        #usa la lista de tokens y la tablaActionGoto para hacer el parsing
-        pass
+        # Inicializar la pila con el estado inicial
+        stack = [0]  # Pila de estados
+        
+        # Agregar el símbolo de fin de cadena si no está presente
+        if not tokenlist or tokenlist[-1] != '$':
+            tokenlist = tokenlist + ['$']
+        
+        # Índice para recorrer la lista de tokens
+        input_index = 0
+        
+        print(f"Iniciando parsing con tokens: {tokenlist}")
+        print(f"Estado inicial de la pila: {stack}")
+        
+        while input_index < len(tokenlist):
+            # Estado actual (tope de la pila)
+            current_state = str(stack[-1])
+            
+            # Token actual
+            current_token = tokenlist[input_index]
+            
+            print(f"\nEstado actual: {current_state}, Token actual: {current_token}")
+            print(f"Pila: {stack}")
+            
+            # Buscar la acción en la tabla
+            try:
+                action = self.action_goto_table.Action(current_state, current_token)
+                print(f"Acción encontrada: {action}")
+                
+                if action == "":
+                    print(f"Error sintáctico: No hay acción definida para estado {current_state} y token '{current_token}'")
+                    return False
+                    
+            except Exception as e:
+                print(f"Error al buscar acción: {e}")
+                return False
+            
+            # Procesar la acción
+            if action == "acc":
+                # ACCEPT - Parsing exitoso
+                print("Parsing completado exitosamente (ACCEPT)")
+                return True
+                
+            elif action.startswith('s'):
+                # SHIFT - Desplazar token y cambiar de estado
+                new_state = int(action[1:])  # Extraer número del estado
+                stack.append(new_state)
+                input_index += 1  # Avanzar al siguiente token
+                print(f"SHIFT: Moviendo a estado {new_state}, avanzando token")
+                
+            elif action.startswith('r'):
+                # REDUCE - Aplicar reducción
+                production_num = int(action[1:])  # Extraer número de producción
+                
+                if production_num not in self.production_numbers:
+                    print(f"Error: Producción {production_num} no encontrada")
+                    return False
+                
+                # Obtener la producción
+                left_symbol, right_symbols = self.production_numbers[production_num]
+                production_length = len(right_symbols)
+                
+                print(f"REDUCE: Aplicando producción {production_num}: {left_symbol} -> {' '.join(right_symbols)}")
+                
+                # Hacer pop de tantos estados como símbolos en la parte derecha
+                for _ in range(production_length):
+                    if len(stack) <= 1:  # Proteger el estado inicial
+                        print(f"Error: Intento de hacer pop en pila vacía")
+                        return False
+                    stack.pop()
+                
+                # Estado después de la reducción
+                current_state_after_reduce = str(stack[-1])
+                
+                # Buscar el GOTO para el símbolo no terminal
+                try:
+                    goto_state = self.action_goto_table.Goto(current_state_after_reduce, left_symbol)
+                    print(f"GOTO: Desde estado {current_state_after_reduce} con {left_symbol} -> estado {goto_state}")
+                    
+                    if goto_state == "":
+                        print(f"Error sintáctico: No hay GOTO definido para estado {current_state_after_reduce} y no terminal '{left_symbol}'")
+                        return False
+                    
+                    # Apilar el nuevo estado
+                    stack.append(int(goto_state))
+                    
+                except Exception as e:
+                    print(f"Error al buscar GOTO: {e}")
+                    return False
+            
+            else:
+                print(f"Error: Acción desconocida '{action}'")
+                return False
+        
+        # Si llegamos aquí sin ACCEPT, hay un error
+        print("Error: Se procesaron todos los tokens sin encontrar ACCEPT")
+        return False
 
     #Obtiene las transiciones para un estado dado del autómata.
     def get_state_transitions(self, state):
@@ -172,3 +266,141 @@ class AutomataLR:
     #Obtiene el conjunto FOLLOW para un simbolo gramatical.
     def get_follow_set(self, symbol):
         return self.first_follow_table[symbol]["follow"]
+
+    def visualize_automaton(self, filename="automata_lr0", format="png", view=True):
+        try:
+            from graphviz import Digraph
+        except ImportError:
+            print("Error: Graphviz no está instalado. Ejecuta: pip install graphviz")
+            return None
+        
+        # Crear el grafo dirigido
+        dot = Digraph(comment='Autómata LR(0)')
+        dot.attr(rankdir='TB')  # Dirección de arriba hacia abajo
+        dot.attr('node', shape='rectangle', style='rounded,filled', fillcolor='lightblue')
+        dot.attr('edge', fontsize='10')
+        
+        # Agregar nodos (estados)
+        for state_name, state_data in self.automata_table.items():
+            # Crear etiqueta del estado con sus ítems
+            label = self._create_state_label(state_name, state_data['items'])
+            
+            # Determinar el color del nodo según el tipo de estado
+            node_color = self._get_node_color(state_data['items'])
+            
+            dot.node(state_name, label=label, fillcolor=node_color)
+        
+        # Agregar aristas (transiciones)
+        for state_name, state_data in self.automata_table.items():
+            for symbol, target_state in state_data['transitions'].items():
+                # Determinar el color de la arista según el tipo de símbolo
+                edge_color = 'blue' if symbol in self.non_terminals else 'red'
+                edge_style = 'bold' if symbol in self.non_terminals else 'solid'
+                
+                dot.edge(state_name, target_state, 
+                        label=symbol, 
+                        color=edge_color,
+                        style=edge_style)
+        
+        # Agregar nodo inicial invisible para mostrar el estado inicial
+        dot.node('start', style='invisible')
+        dot.edge('start', 'I0', style='bold', color='green')
+        
+        # Generar el archivo
+        try:
+            output_path = dot.render(filename, format=format, cleanup=True)
+            print(f"✅ Autómata generado exitosamente: {output_path}")
+            
+            if view:
+                dot.view()
+                
+            return output_path
+            
+        except Exception as e:
+            print(f"Error al generar el archivo: {e}")
+            return None
+    
+    def _create_state_label(self, state_name, items):
+        # Comenzar la tabla HTML
+        label = f'<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
+        
+        # Encabezado del estado
+        label += f'<TR><TD BGCOLOR="darkblue" COLSPAN="1">'
+        label += f'<FONT COLOR="white"><B>{state_name}</B></FONT></TD></TR>'
+        
+        # Agregar cada ítem
+        for item in items:
+            item_str = self._format_item(item)
+            label += f'<TR><TD ALIGN="LEFT">{item_str}</TD></TR>'
+        
+        label += '</TABLE>>'
+        return label
+    
+    def _format_item(self, item):
+        left = item['left']
+        prod = item['prod'].copy()
+        dot_pos = item['dot']
+        
+        # Insertar el punto en la posición correcta
+        if dot_pos < len(prod):
+            prod.insert(dot_pos, '•')
+        else:
+            prod.append('•')
+        
+        # Crear la cadena del ítem
+        right_side = ' '.join(prod)
+        return f"{left} → {right_side}"
+    
+    def _get_node_color(self, items):
+        # Verificar si hay ítem de aceptación (E' → E•)
+        for item in items:
+            if item['left'] == "E'" and item['dot'] == len(item['prod']):
+                return 'lightgreen'  # Estado de aceptación
+        
+        # Verificar si hay ítems de reducción (punto al final)
+        has_reduce = any(item['dot'] == len(item['prod']) and item['left'] != "E'" 
+                        for item in items)
+        
+        # Verificar si hay ítems de desplazamiento (punto no al final)
+        has_shift = any(item['dot'] < len(item['prod']) for item in items)
+        
+        if has_reduce and has_shift:
+            return 'orange'      # Estado con conflicto shift-reduce
+        elif has_reduce:
+            return 'lightcoral'  # Estado de reducción
+        else:
+            return 'lightblue'   # Estado de desplazamiento
+    
+    def print_automaton_info(self):
+        """
+        Imprime información detallada del autómata en la consola.
+        """
+        print("INFORMACIÓN DEL AUTÓMATA LR(0)")
+        print("=" * 50)
+        
+        total_states = len(self.automata_table)
+        total_transitions = sum(len(state['transitions']) for state in self.automata_table.values())
+        
+        print(f"Total de estados: {total_states}")
+        print(f"Total de transiciones: {total_transitions}")
+        print(f"No terminales: {self.non_terminals}")
+        print(f"Terminales: {self.terminals}")
+        
+        print("\nESTADOS DETALLADOS:")
+        for state_name, state_data in self.automata_table.items():
+            print(f"\n🔹 {state_name}:")
+            
+            # Mostrar ítems
+            print("  Ítems:")
+            for item in state_data['items']:
+                formatted_item = self._format_item(item)
+                print(f"    {formatted_item}")
+            
+            # Mostrar transiciones
+            if state_data['transitions']:
+                print("  Transiciones:")
+                for symbol, target in state_data['transitions'].items():
+                    symbol_type = "NT" if symbol in self.non_terminals else "T"
+                    print(f"    {symbol} ({symbol_type}) → {target}")
+            else:
+                print("  Sin transiciones")
