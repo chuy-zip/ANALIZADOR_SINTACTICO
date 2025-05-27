@@ -110,34 +110,18 @@ class YalpParser:
         return simplified
 
     def augment(self, grammar):
-        # grammar: dict of nonterm -> list of prod strings
-        # convert to list of symbols
+        # grammar: dict of nonterminal -> list of prod strings
         prods = {nt: [r.split() for r in rules] for nt, rules in grammar.items()}
         start = next(iter(grammar))
         aug_start = start + "'"
 
         items = []
-        seen = set()
-        def add(left, prod, dot):
-            key = (left, tuple(prod), dot)
-            if key in seen: return False
-            seen.add(key)
-            items.append({'left': left, 'prod': prod, 'dot': dot})
-            return True
-
-        # item inicial
-        add(aug_start, [start], 0)
-        # closure
-        changed = True
-        while changed:
-            changed = False
-            for left, prod, dot in [(it['left'], it['prod'], it['dot']) for it in items]:
-                if dot < len(prod):
-                    sym = prod[dot]
-                    if sym in prods:
-                        for p in prods[sym]:
-                            if add(sym, p, 0):
-                                changed = True
+        # producción aumentada
+        items.append({'left': aug_start, 'prod': [start]})
+        # producciones originales
+        for nt, rules in prods.items():
+            for prod in rules:
+                items.append({'left': nt, 'prod': prod})
         return items
 
     
