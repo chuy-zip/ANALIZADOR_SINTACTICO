@@ -15,27 +15,26 @@ class ReadYalp:
         self.yalp_file = yalp_file
 
     def read_file(self):
+        # Leer archivo carácter a carácter
         with open(self.yalp_file, 'r', encoding='utf-8') as f:
             return list(f.read())
 
 
 def read_token(chars, index):
-    # Manejo de comentarios /* ... */
+    # Saltar comentarios /* ... */
     if index + 1 < len(chars) and chars[index] == '/' and chars[index+1] == '*':
         idx = index + 2
-        # Saltar hasta */
         while idx + 1 < len(chars) and not (chars[idx] == '*' and chars[idx+1] == '/'):
             idx += 1
         return None, idx + 2
 
-    # Separadores y token único
+    # Tokens únicos
     punctuation = {':', '|', ';'}
     ch = chars[index]
     if ch in punctuation:
         return ch, index + 1
 
-    # Si es espacio, no debería llegar aquí (se ignora fuera)
-    # Construir token hasta whitespace o puntuación
+    # Construir token hasta espacio, puntuación o comentario
     start = index
     while index < len(chars):
         c = chars[index]
@@ -45,10 +44,12 @@ def read_token(chars, index):
     token = ''.join(chars[start:index])
     return token, index
 
-
 class YalpParser:
-    def __init__(self, yalp_file):
+    def __init__(self, yalp_file, option):
         self.yalp_file = yalp_file
+        self.option = option
+        # Selecciona el archivo tokens_yaln.json según la opción
+        self.tokens_file = f'proyecto1/listas_regex/tokens_yal{option}.json'
 
     def process(self):
         chars = ReadYalp(self.yalp_file).read_file()
@@ -56,7 +57,6 @@ class YalpParser:
         idx = 0
         while idx < len(chars):
             c = chars[idx]
-            # Ignorar espacios
             if c.isspace():
                 idx += 1
                 continue
@@ -65,11 +65,10 @@ class YalpParser:
                 continue
             tokens.append(tk)
 
-        # Parseo de producciones
+        # Construir producciones crudas
         productions = {}
         i = 0
         while i < len(tokens):
-            # Nombre de producción seguido de ':'
             if i+1 < len(tokens) and tokens[i+1] == ':':
                 name = tokens[i]
                 i += 2
@@ -82,17 +81,41 @@ class YalpParser:
                     else:
                         current += tokens[i] + ' '
                     i += 1
-                # última regla antes de ';'
                 rules.append(current.strip())
                 productions[name] = rules
             else:
                 i += 1
+        #print(productions)
         return productions
 
-    def to_json(self, output_dir='output', out_name='grammar_example.json'):
-        prods = self.process()
+    def simplify(self, productions):
+        # Carga lexemas de tokens
+        with open(self.tokens_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        lex_dict = {tok['nombre']: tok['lexema'] for tok in data['tokens']}
+
+        simplified = {}
+        for name, rules in productions.items():
+            # Simplifica nombre de producción
+            new_name = lex_dict.get(name, name[0].upper())
+            new_rules = []
+            for rule in rules:
+                symbols = rule.split()
+                new_syms = []
+                for sym in symbols:
+                    new_syms.append(lex_dict.get(sym, sym[0].upper()))
+                new_rules.append(' '.join(new_syms))
+            simplified[new_name] = new_rules
+        return simplified
+
+    
+
+    def to_json(self, output_dir='real_output'):
+        raw = self.process()
+        simple = self.simplify(raw)
         os.makedirs(output_dir, exist_ok=True)
-        path = os.path.join(output_dir, out_name)
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump(prods, f, ensure_ascii=False, indent=2)
-        return path, prods
+        gfile = os.path.join(output_dir, 'grammar.json')
+        with open(gfile, 'w', encoding='utf-8') as f:
+            json.dump(simple, f, ensure_ascii=False, indent=2)
+
+        return simple
