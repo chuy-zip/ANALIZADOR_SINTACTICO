@@ -35,9 +35,11 @@ def main():
         return
 
     parser = YalpParser(filename, option)
-    productions = parser.to_json()
+    productions, au_grammar = parser.to_json()
     print(f"\nArchivo grammar.json generado en real_output/\n")
     print(json.dumps(productions, ensure_ascii=False, indent=2))
+    print(f"\nArchivo augmented_grammar.json generado en real_output/\n")
+    print(json.dumps(au_grammar, ensure_ascii=False, indent=2))
     
 
 if __name__ == '__main__':

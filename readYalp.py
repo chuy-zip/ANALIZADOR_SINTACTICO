@@ -103,19 +103,58 @@ class YalpParser:
                 symbols = rule.split()
                 new_syms = []
                 for sym in symbols:
-                    new_syms.append(lex_dict.get(sym, sym[0].upper()))
+                    new_syms.append(lex_dict.get(sym.upper(), sym[0].upper()))
                 new_rules.append(' '.join(new_syms))
             simplified[new_name] = new_rules
+        #print(simplified)
         return simplified
+
+    def augment(self, grammar):
+        # grammar: dict of nonterm -> list of prod strings
+        # convert to list of symbols
+        prods = {nt: [r.split() for r in rules] for nt, rules in grammar.items()}
+        start = next(iter(grammar))
+        aug_start = start + "'"
+
+        items = []
+        seen = set()
+        def add(left, prod, dot):
+            key = (left, tuple(prod), dot)
+            if key in seen: return False
+            seen.add(key)
+            items.append({'left': left, 'prod': prod, 'dot': dot})
+            return True
+
+        # item inicial
+        add(aug_start, [start], 0)
+        # closure
+        changed = True
+        while changed:
+            changed = False
+            for left, prod, dot in [(it['left'], it['prod'], it['dot']) for it in items]:
+                if dot < len(prod):
+                    sym = prod[dot]
+                    if sym in prods:
+                        for p in prods[sym]:
+                            if add(sym, p, 0):
+                                changed = True
+        return items
 
     
 
     def to_json(self, output_dir='real_output'):
+        # obtener gramática
         raw = self.process()
         simple = self.simplify(raw)
         os.makedirs(output_dir, exist_ok=True)
         gfile = os.path.join(output_dir, 'grammar.json')
         with open(gfile, 'w', encoding='utf-8') as f:
             json.dump(simple, f, ensure_ascii=False, indent=2)
+            
+        # generar gramática aumentada
+        aug_items = self.augment(simple)
+        aug_file = os.path.join(output_dir, 'augmented_grammar.json')
+        with open(aug_file, 'w', encoding='utf-8') as f:
+            json.dump(aug_items, f, ensure_ascii=False, indent=2)
 
-        return simple
+        return simple, aug_items
