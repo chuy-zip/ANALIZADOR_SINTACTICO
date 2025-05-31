@@ -58,14 +58,129 @@
       }
     ],
     "transitions": {
-      "E": "I1",
-      "F": "I2",
-      "T": "I3",
-      "(": "I4",
-      "id": "I5"
+      "F": "I1",
+      "T": "I2",
+      "(": "I3",
+      "id": "I4",
+      "E": "I5"
     }
   },
   "I1": {
+    "items": [
+      {
+        "left": "T",
+        "prod": [
+          "F"
+        ],
+        "dot": 1
+      }
+    ],
+    "transitions": {}
+  },
+  "I2": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "T"
+        ],
+        "dot": 1
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 1
+      }
+    ],
+    "transitions": {
+      "*": "I6"
+    }
+  },
+  "I3": {
+    "items": [
+      {
+        "left": "E",
+        "prod": [
+          "E",
+          "+",
+          "T"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "E",
+        "prod": [
+          "T"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "id"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 1
+      },
+      {
+        "left": "T",
+        "prod": [
+          "F"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 0
+      }
+    ],
+    "transitions": {
+      "F": "I1",
+      "T": "I2",
+      "(": "I3",
+      "id": "I4",
+      "E": "I7"
+    }
+  },
+  "I4": {
+    "items": [
+      {
+        "left": "F",
+        "prod": [
+          "id"
+        ],
+        "dot": 1
+      }
+    ],
+    "transitions": {}
+  },
+  "I5": {
     "items": [
       {
         "left": "E",
@@ -85,136 +200,12 @@
       }
     ],
     "transitions": {
-      "+": "I6"
+      "+": "I8"
     }
-  },
-  "I2": {
-    "items": [
-      {
-        "left": "T",
-        "prod": [
-          "F"
-        ],
-        "dot": 1
-      }
-    ],
-    "transitions": {}
-  },
-  "I3": {
-    "items": [
-      {
-        "left": "E",
-        "prod": [
-          "T"
-        ],
-        "dot": 1
-      },
-      {
-        "left": "T",
-        "prod": [
-          "T",
-          "*",
-          "F"
-        ],
-        "dot": 1
-      }
-    ],
-    "transitions": {
-      "*": "I7"
-    }
-  },
-  "I4": {
-    "items": [
-      {
-        "left": "E",
-        "prod": [
-          "E",
-          "+",
-          "T"
-        ],
-        "dot": 0
-      },
-      {
-        "left": "E",
-        "prod": [
-          "T"
-        ],
-        "dot": 0
-      },
-      {
-        "left": "F",
-        "prod": [
-          "(",
-          "E",
-          ")"
-        ],
-        "dot": 0
-      },
-      {
-        "left": "F",
-        "prod": [
-          "id"
-        ],
-        "dot": 0
-      },
-      {
-        "left": "F",
-        "prod": [
-          "(",
-          "E",
-          ")"
-        ],
-        "dot": 1
-      },
-      {
-        "left": "T",
-        "prod": [
-          "F"
-        ],
-        "dot": 0
-      },
-      {
-        "left": "T",
-        "prod": [
-          "T",
-          "*",
-          "F"
-        ],
-        "dot": 0
-      }
-    ],
-    "transitions": {
-      "E": "I8",
-      "F": "I2",
-      "T": "I3",
-      "(": "I4",
-      "id": "I5"
-    }
-  },
-  "I5": {
-    "items": [
-      {
-        "left": "F",
-        "prod": [
-          "id"
-        ],
-        "dot": 1
-      }
-    ],
-    "transitions": {}
   },
   "I6": {
     "items": [
       {
-        "left": "E",
-        "prod": [
-          "E",
-          "+",
-          "T"
-        ],
-        "dot": 2
-      },
-      {
         "left": "F",
         "prod": [
           "(",
@@ -233,59 +224,43 @@
       {
         "left": "T",
         "prod": [
-          "F"
-        ],
-        "dot": 0
-      },
-      {
-        "left": "T",
-        "prod": [
           "T",
           "*",
           "F"
         ],
-        "dot": 0
+        "dot": 2
       }
     ],
     "transitions": {
-      "F": "I2",
-      "(": "I4",
-      "id": "I5",
-      "T": "I9"
+      "F": "I9",
+      "(": "I3",
+      "id": "I4"
     }
   },
   "I7": {
     "items": [
       {
+        "left": "E",
+        "prod": [
+          "E",
+          "+",
+          "T"
+        ],
+        "dot": 1
+      },
+      {
         "left": "F",
         "prod": [
           "(",
           "E",
           ")"
         ],
-        "dot": 0
-      },
-      {
-        "left": "F",
-        "prod": [
-          "id"
-        ],
-        "dot": 0
-      },
-      {
-        "left": "T",
-        "prod": [
-          "T",
-          "*",
-          "F"
-        ],
         "dot": 2
       }
     ],
     "transitions": {
-      "F": "I10",
-      "(": "I4",
-      "id": "I5"
+      "+": "I8",
+      ")": "I10"
     }
   },
   "I8": {
@@ -297,7 +272,7 @@
           "+",
           "T"
         ],
-        "dot": 1
+        "dot": 2
       },
       {
         "left": "F",
@@ -306,15 +281,68 @@
           "E",
           ")"
         ],
-        "dot": 2
+        "dot": 0
+      },
+      {
+        "left": "F",
+        "prod": [
+          "id"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "F"
+        ],
+        "dot": 0
+      },
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 0
       }
     ],
     "transitions": {
-      "+": "I6",
-      ")": "I11"
+      "F": "I1",
+      "(": "I3",
+      "id": "I4",
+      "T": "I11"
     }
   },
   "I9": {
+    "items": [
+      {
+        "left": "T",
+        "prod": [
+          "T",
+          "*",
+          "F"
+        ],
+        "dot": 3
+      }
+    ],
+    "transitions": {}
+  },
+  "I10": {
+    "items": [
+      {
+        "left": "F",
+        "prod": [
+          "(",
+          "E",
+          ")"
+        ],
+        "dot": 3
+      }
+    ],
+    "transitions": {}
+  },
+  "I11": {
     "items": [
       {
         "left": "E",
@@ -336,35 +364,7 @@
       }
     ],
     "transitions": {
-      "*": "I7"
+      "*": "I6"
     }
-  },
-  "I10": {
-    "items": [
-      {
-        "left": "T",
-        "prod": [
-          "T",
-          "*",
-          "F"
-        ],
-        "dot": 3
-      }
-    ],
-    "transitions": {}
-  },
-  "I11": {
-    "items": [
-      {
-        "left": "F",
-        "prod": [
-          "(",
-          "E",
-          ")"
-        ],
-        "dot": 3
-      }
-    ],
-    "transitions": {}
   }
 }

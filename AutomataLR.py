@@ -153,31 +153,31 @@ class AutomataLR:
         return ActionGotoTable(action_goto_table)
     
     #Modulo 5
-    def LR_parsing(self, tokenlist):
-        # Inicializar la pila con el estado inicial
+    def LR_parsing(self, token_iterator, lex_dict):
         stack = [0]  # Pila de estados
+        token_buffer = []
         
-        # Agregar el símbolo de fin de cadena si no está presente
-        if not tokenlist or tokenlist[-1] != '$':
-            tokenlist = tokenlist + ['$']
+        # Función para obtener el siguiente token
+        def get_next_token():
+            if token_buffer:
+                return token_buffer.pop(0)
+            try:
+                token = next(token_iterator)
+                simple_token = lex_dict.get(token["TokenName"])
+                return simple_token
+            except StopIteration:
+                return '$'  # Fin de entrada
         
-        # Índice para recorrer la lista de tokens
-        input_index = 0
+        current_token = get_next_token()
         
-        print(f"Iniciando parsing con tokens: {tokenlist}")
+        print(f"Iniciando parsing con primer token: {current_token}")
         print(f"Estado inicial de la pila: {stack}")
         
-        while input_index < len(tokenlist):
-            # Estado actual (tope de la pila)
+        while True:
             current_state = str(stack[-1])
-            
-            # Token actual
-            current_token = tokenlist[input_index]
-            
             print(f"\nEstado actual: {current_state}, Token actual: {current_token}")
             print(f"Pila: {stack}")
             
-            # Buscar la acción en la tabla
             try:
                 action = self.action_goto_table.Action(current_state, current_token)
                 print(f"Acción encontrada: {action}")
@@ -190,44 +190,36 @@ class AutomataLR:
                 print(f"Error al buscar acción: {e}")
                 return False
             
-            # Procesar la acción
             if action == "acc":
-                # ACCEPT - Parsing exitoso
                 print("Parsing completado exitosamente (ACCEPT)")
                 return True
                 
             elif action.startswith('s'):
-                # SHIFT - Desplazar token y cambiar de estado
-                new_state = int(action[1:])  # Extraer número del estado
+                new_state = int(action[1:])
                 stack.append(new_state)
-                input_index += 1  # Avanzar al siguiente token
+                current_token = get_next_token()
                 print(f"SHIFT: Moviendo a estado {new_state}, avanzando token")
                 
             elif action.startswith('r'):
-                # REDUCE - Aplicar reducción
-                production_num = int(action[1:])  # Extraer número de producción
+                production_num = int(action[1:])
                 
                 if production_num not in self.production_numbers:
                     print(f"Error: Producción {production_num} no encontrada")
                     return False
                 
-                # Obtener la producción
                 left_symbol, right_symbols = self.production_numbers[production_num]
                 production_length = len(right_symbols)
                 
                 print(f"REDUCE: Aplicando producción {production_num}: {left_symbol} -> {' '.join(right_symbols)}")
                 
-                # Hacer pop de tantos estados como símbolos en la parte derecha
                 for _ in range(production_length):
-                    if len(stack) <= 1:  # Proteger el estado inicial
+                    if len(stack) <= 1:
                         print(f"Error: Intento de hacer pop en pila vacía")
                         return False
                     stack.pop()
                 
-                # Estado después de la reducción
                 current_state_after_reduce = str(stack[-1])
                 
-                # Buscar el GOTO para el símbolo no terminal
                 try:
                     goto_state = self.action_goto_table.Goto(current_state_after_reduce, left_symbol)
                     print(f"GOTO: Desde estado {current_state_after_reduce} con {left_symbol} -> estado {goto_state}")
@@ -236,7 +228,6 @@ class AutomataLR:
                         print(f"Error sintáctico: No hay GOTO definido para estado {current_state_after_reduce} y no terminal '{left_symbol}'")
                         return False
                     
-                    # Apilar el nuevo estado
                     stack.append(int(goto_state))
                     
                 except Exception as e:
@@ -246,10 +237,6 @@ class AutomataLR:
             else:
                 print(f"Error: Acción desconocida '{action}'")
                 return False
-        
-        # Si llegamos aquí sin ACCEPT, hay un error
-        print("Error: Se procesaron todos los tokens sin encontrar ACCEPT")
-        return False
 
     #Obtiene las transiciones para un estado dado del autómata.
     def get_state_transitions(self, state):

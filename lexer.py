@@ -50,7 +50,6 @@ def load_token_names(json_file):
 
 
 def lexical_analyzer(input_string, start_node, token_names):
-    tokens = []
     current_position = 0
 
     with open('log.txt', 'w') as log_file:
@@ -78,22 +77,17 @@ def lexical_analyzer(input_string, start_node, token_names):
                 lexeme = input_string[current_position:last_accepting_pos + 1]
                 token_name = token_names.get(selected_token_id, "UNKNOWN")
 
-                tokens.append({"TokenName": token_name, "Lexema": lexeme})
-
-                log_entry = f"Token reconocido {
-                    repr(lexeme)} con regex {token_name}\n"
+                log_entry = f"Token reconocido {repr(lexeme)} con regex {token_name}\n"
                 log_file.write(log_entry)
 
                 current_position = last_accepting_pos + 1
+                yield {"TokenName": token_name, "Lexema": lexeme}
             else:
                 error_char = input_string[current_position]
-                error_msg = f"Error léxico en la posición {
-                    current_position}: '{repr(error_char)}'\n"
+                error_msg = f"Error léxico en la posición {current_position}: '{repr(error_char)}'\n"
                 log_file.write(error_msg)
                 print(error_msg)
                 current_position += 1
-
-    return tokens
 
 
 def process_file(input_data, start_node, token_names, isFile):

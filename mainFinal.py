@@ -179,23 +179,8 @@ while True:
         print(processing_msg)
 
         # aqui queda la lista de tokens de 
-        tokens = process_file(file_path, start_node, token_names, True)
-        print(f"tokens generados\n{tokens}")
-
-        simple_tokens = []
-        print(lex_dict)
-        
-        for token in tokens:
-            
-
-            simple_token = lex_dict.get(token["TokenName"])
-            print(simple_token)
-            simple_tokens.append(simple_token)
-
-        print(simple_tokens)
-        # en esta parte de aca es donde se tiene que hacer el parse utilizando el automata
-        # PENDIENTE hacer que sea productor consumidor
-        Automata.LR_parsing(simple_tokens)
+        token_iterator = process_file(file_path, start_node, token_names, True)
+        Automata.LR_parsing(token_iterator, lex_dict)
 
         # json_filename = f'tokens.json'
         # with open(json_filename, 'w') as json_file:
