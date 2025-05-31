@@ -7,12 +7,12 @@ with open('./output/grammar_example.json', 'r', encoding='utf-8') as file:
 with open('./output/automata_table_Example.json', 'r') as file:
     transition_table = json.load(file)
 
-print(f'{grammar=}')
-print(f'{transition_table=}')
+#print(f'{grammar=}')
+#print(f'{transition_table=}')
 Automata = AutomataLR(transition_table, grammar)
 
-print(Automata.action_goto_table.Action("0", "id"))
-print(Automata.action_goto_table.Goto("0",'E'))
+#print(Automata.action_goto_table.Action("0", "id"))
+#print(Automata.action_goto_table.Goto("0",'E'))
 
 def run_tests():
     print("🧪 INICIANDO PRUEBAS DEL PARSER LR")
@@ -79,7 +79,7 @@ run_tests()
 
 print("Generando visualización completa...")
 Automata.visualize_automaton(
-    filename="automata_lr0_completo",
+    filename="AUTOMATA_LR(0)/automata_lr0_completo",
     format="png",
     view=True
 )
@@ -91,7 +91,7 @@ Automata.print_automaton_info()
 formats = ['png', 'pdf', 'svg']
 for fmt in formats:
     Automata.visualize_automaton(
-        filename=f"automata_lr0_{fmt}",
+        filename=f"AUTOMATA_LR(0)/automata_lr0_{fmt}",
         format=fmt,
         view=False
     )

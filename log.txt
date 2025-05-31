@@ -1,0 +1,5 @@
+Token reconocido 'num1' con regex ID
+Token reconocido '*' con regex TIMES
+Token reconocido 'num2' con regex ID
+Token reconocido '+' con regex PLUS
+Token reconocido 'num3' con regex ID

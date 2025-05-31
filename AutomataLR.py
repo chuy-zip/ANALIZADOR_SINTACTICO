@@ -65,8 +65,7 @@ class AutomataLR:
         return first_follow_table
 
     def build_action_goto_table(self):
-        print("WIP")
-
+        
         action_goto_table = {}
         # generando la tabla
         for state in self.automata_table.keys():
@@ -100,7 +99,7 @@ class AutomataLR:
 
                     # la interseccion entre el no terminal y el estado (en goto) es el numero del siguiente estado
                     action_goto_table[state_number]["goto"][transition_symbol] = next_state_number
-        print(action_goto_table)
+        
 
         # llenar las acciones (shift/accept/reduce) 
         for state_name, state_data in self.automata_table.items():
@@ -149,7 +148,8 @@ class AutomataLR:
                                 print(f" - Acción existente: {current_action}")
                                 print(f" - Nueva acción: {new_action}")
                                 print(f" - Producción en conflicto: {left_symbol} -> {' '.join(item['prod'])}")
-                                
+        print(action_goto_table)
+
         return ActionGotoTable(action_goto_table)
     
     #Modulo 5
