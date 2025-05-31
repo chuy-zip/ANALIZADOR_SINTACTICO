@@ -103,7 +103,10 @@ try:
 except (ValueError, IndexError):
     print("Opción inválida.")
 
+
 parser = YalpParser(filename, option)
+lex_dict = parser.get_lexer_token_list()
+
 productions, au_grammar = parser.to_json()
 print(f"\nArchivo grammar.json generado en real_output/\n")
 #print(json.dumps(productions, ensure_ascii=False, indent=2))
@@ -166,11 +169,20 @@ while True:
 
         # aqui queda la lista de tokens de 
         tokens = process_file(file_path, start_node, token_names, True)
+        print(f"tokens generados\n{tokens}")
+
+        simple_tokens = []
+
+        for token in tokens:
+            print(lex_dict)
+
+            simple_token = lex_dict.get(token["TokenName"])
+            print(simple_token)
+            simple_tokens.append(simple_token)
 
         # en esta parte de aca es donde se tiene que hacer el parse utilizando el automata
         # PENDIENTE
-
-        print(f"tokens generados\n{tokens}")
+        Automata.LR_parsing(simple_tokens)
 
         # json_filename = f'tokens.json'
         # with open(json_filename, 'w') as json_file:
@@ -186,10 +198,10 @@ while True:
 
         tokens = process_file(input_text, start_node, token_names, False)
 
-        with open('tokens_manual.json', 'w') as json_file:
-            json.dump(tokens, json_file, indent=4)
-
-        tokens_str = json.dumps(tokens, indent=4)
+        #with open('tokens_manual.json', 'w') as json_file:
+        #    json.dump(tokens, json_file, indent=4)
+        #
+        #tokens_str = json.dumps(tokens, indent=4)
 
     elif choice == '5':
         exit_msg = "\nSaliendo del programa. ¡Hasta luego!\n"

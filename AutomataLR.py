@@ -65,7 +65,7 @@ class AutomataLR:
         return first_follow_table
 
     def build_action_goto_table(self):
-        
+
         action_goto_table = {}
         # generando la tabla
         for state in self.automata_table.keys():
@@ -148,7 +148,7 @@ class AutomataLR:
                                 print(f" - Acción existente: {current_action}")
                                 print(f" - Nueva acción: {new_action}")
                                 print(f" - Producción en conflicto: {left_symbol} -> {' '.join(item['prod'])}")
-        print(action_goto_table)
+        #print(action_goto_table)
 
         return ActionGotoTable(action_goto_table)
     

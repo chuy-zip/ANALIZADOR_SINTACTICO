@@ -142,3 +142,10 @@ class YalpParser:
             json.dump(aug_items, f, ensure_ascii=False, indent=2)
 
         return simple, aug_items
+    
+    def get_lexer_token_list(self):
+        with open(self.tokens_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        lex_dict = {tok['nombre']: tok['lexema'] for tok in data['tokens']}
+
+        return lex_dict
