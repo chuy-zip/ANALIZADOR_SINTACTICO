@@ -12,8 +12,6 @@ import json
 from readYalp import YalpParser
 import subprocess
 
-
-
 def main():
     print("Generador de analizador sintáctico")
 

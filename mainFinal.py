@@ -124,14 +124,25 @@ print('automaton.json generado en real_output/')
 
 grammar = {}
 transition_table = {}
-with open('./output/grammar_example.json', 'r', encoding='utf-8') as file:
+#real_output/automaton.json
+#real_output/grammar.json
+with open('./real_output/grammar.json', 'r', encoding='utf-8') as file:
     grammar = json.load(file)
-with open('./output/automata_table_Example.json', 'r') as file:
+with open('./real_output/automaton.json', 'r') as file:
     transition_table = json.load(file)
 
 #print(f'{grammar}')
 #print(f'{transition_table}')
 Automata = AutomataLR(transition_table, grammar)
+# Generar en diferentes formatos
+formats = ['png', 'pdf', 'svg']
+for fmt in formats:
+    Automata.visualize_automaton(
+        filename=f"AUTOMATA_LR(0)/automata_lr0_{fmt}",
+        format=fmt,
+        view=False
+    )
+    print(f"Generado en formato {fmt}")
 
 #print(Automata.action_goto_table.Action("0", "id"))
 #print(Automata.action_goto_table.Goto("0",'E'))
@@ -181,7 +192,7 @@ while True:
             simple_tokens.append(simple_token)
 
         # en esta parte de aca es donde se tiene que hacer el parse utilizando el automata
-        # PENDIENTE
+        # PENDIENTE hacer que sea productor consumidor
         Automata.LR_parsing(simple_tokens)
 
         # json_filename = f'tokens.json'
