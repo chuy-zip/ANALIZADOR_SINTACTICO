@@ -59,7 +59,7 @@ print("\nLista de acciones finales:")
 print(actions)
 
 # Guardamos en un archivo JSON los tokens finales emparejados con sus acciones
-#guardar_tokens_json(final_tokens, actions, "expressions.json")
+guardar_tokens_json(final_tokens, actions, "expressions.json")
 #print("\nArchivo 'tokens.json' generado exitosamente.")
 
 # Creacion del AFD a partir del archivo expressions.json
