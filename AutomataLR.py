@@ -2,11 +2,13 @@ from ActionGotoTable import ActionGotoTable
 from first_follow import calculate_first, calculate_follow
 
 class AutomataLR:
-    def __init__(self, transition_table, original_grammar):
+    def __init__(self, transition_table, original_grammar, augmented_start_symbol=None):
         self.automata_table: dict = transition_table
         self.original_grammar: dict = original_grammar
         self.non_terminals: set = set(original_grammar.keys())
         self.terminals: set = self.get_terminals()
+        # Detección automática del símbolo aumentado si no se provee
+        self.augmented_start = augmented_start_symbol or (next(iter(original_grammar))) + "'"
         self.first_follow_table: dict = self.compute_first_follow()
         self.production_numbers = self.number_productions()
         self.action_goto_table: ActionGotoTable = self.build_action_goto_table()
@@ -113,13 +115,13 @@ class AutomataLR:
 
            #ACCEPT (ítem E' → E·)
             for item in state_data["items"]:
-                if item["left"] == "E'" and item["dot"] == len(item["prod"]):  # E' → E·
+                if item["left"] == self.augmented_start and item["dot"] == len(item["prod"]):  # E' → E·
                     action_goto_table[state_num]["action"]["$"] = "acc"
                     break  # Solo hay un ítem E' → E· por estado
 
             #REDUCE (para ítems con punto al final, excluyendo E')
             for item in state_data["items"]:
-                if item["dot"] == len(item["prod"]) and item["left"] != "E'":
+                if item["dot"] == len(item["prod"]) and item["left"] != self.augmented_start:
                     left_symbol = item["left"]
                     production = (left_symbol, item["prod"])
                     
