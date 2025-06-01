@@ -19,7 +19,8 @@ def main():
         "input/slr-1.yalp",
         "input/slr-2.yalp",
         "input/slr-3.yalp",
-        "input/slr-4.yalp"
+        "input/slr-4.yalp",
+        "input/slr-1_2.yalp"
     ]
 
     print("Elige un archivo seleccinando el numero correspondiente:")

@@ -1,12 +1,12 @@
+# readYalp.py
 """
 Autores:
-- Nelson García Bravatti 
+- Nelson García Bravatti
 - Ricardo Chuy
 - Joaquín Puente
 
 Diseño de Lenguajes de Programación
 """
-
 import json
 import os
 
@@ -28,8 +28,8 @@ def read_token(chars, index):
             idx += 1
         return None, idx + 2
 
-    # Tokens únicos
-    punctuation = {':', '|', ';'}
+    # Separadores y token único (incluye coma)
+    punctuation = {':', '|', ';', ','}
     ch = chars[index]
     if ch in punctuation:
         return ch, index + 1
@@ -56,19 +56,53 @@ class YalpParser:
         tokens = []
         idx = 0
         while idx < len(chars):
-            c = chars[idx]
-            if c.isspace():
+            if chars[idx].isspace():
                 idx += 1
                 continue
             tk, idx = read_token(chars, idx)
             if tk is None:
                 continue
             tokens.append(tk)
+        print(tokens)
 
-        # Construir producciones crudas
+        # Manejar IGNORE: recopilar tokens a ignorar
+        ignore_tokens = set()
+        i = 0
+        while i < len(tokens):
+            if tokens[i] == 'IGNORE':
+                j = i + 1
+                # Tras IGNORE, leer nombres separados por comas
+                count_coma = 0
+                count_token = 0
+                while j < len(tokens):
+                    if tokens[j] == ',':
+                        j += 1
+                        count_coma += 1 
+                        continue
+                    if tokens[j] in {':', '|', ';'} or tokens[j] == 'IGNORE' or (count_coma + 1) == count_token:
+                        break
+                    # tokens[j] es nombre a ignorar
+                    ignore_tokens.add(tokens[j])
+                    count_token += 1
+                    j += 1
+                i = j
+            else:
+                i += 1
+
+        # Guardar ignore_tokens en real_output/ignore_tokens.json
+        os.makedirs('real_output', exist_ok=True)
+        ignore_file = os.path.join('real_output', 'ignore_tokens.json')
+        with open(ignore_file, 'w', encoding='utf-8') as f:
+            json.dump(list(ignore_tokens), f, ensure_ascii=False, indent=2)
+
+        # Construir producciones crudas, ignorando 'IGNORE' y ','
         productions = {}
         i = 0
         while i < len(tokens):
+            if tokens[i] == 'IGNORE' or tokens[i] == ',':
+                i += 1
+                continue
+            # Nombre de producción seguido de ':'
             if i+1 < len(tokens) and tokens[i+1] == ':':
                 name = tokens[i]
                 i += 2
@@ -78,6 +112,9 @@ class YalpParser:
                     if tokens[i] == '|':
                         rules.append(current.strip())
                         current = ''
+                    elif tokens[i] == ',' or tokens[i] == 'IGNORE':
+                        # omitir
+                        pass
                     else:
                         current += tokens[i] + ' '
                     i += 1
@@ -85,7 +122,7 @@ class YalpParser:
                 productions[name] = rules
             else:
                 i += 1
-        #print(productions)
+
         return productions
 
     def simplify(self, productions):
@@ -106,11 +143,10 @@ class YalpParser:
                     new_syms.append(lex_dict.get(sym.upper(), sym[0].upper()))
                 new_rules.append(' '.join(new_syms))
             simplified[new_name] = new_rules
-        #print(simplified)
         return simplified
 
     def augment(self, grammar):
-        # grammar: dict of nonterminal -> list of prod strings
+        # grammar: dict de no terminal -> lista de cadenas
         prods = {nt: [r.split() for r in rules] for nt, rules in grammar.items()}
         start = next(iter(grammar))
         aug_start = start + "'"
@@ -124,17 +160,15 @@ class YalpParser:
                 items.append({'left': nt, 'prod': prod})
         return items
 
-    
-
     def to_json(self, output_dir='real_output'):
-        # obtener gramática
+        # obtener gramática y tokens a ignorar
         raw = self.process()
         simple = self.simplify(raw)
         os.makedirs(output_dir, exist_ok=True)
         gfile = os.path.join(output_dir, 'grammar.json')
         with open(gfile, 'w', encoding='utf-8') as f:
             json.dump(simple, f, ensure_ascii=False, indent=2)
-            
+
         # generar gramática aumentada
         aug_items = self.augment(simple)
         aug_file = os.path.join(output_dir, 'augmented_grammar.json')
@@ -142,10 +176,9 @@ class YalpParser:
             json.dump(aug_items, f, ensure_ascii=False, indent=2)
 
         return simple, aug_items
-    
+
     def get_lexer_token_list(self):
         with open(self.tokens_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
         lex_dict = {tok['nombre']: tok['lexema'] for tok in data['tokens']}
-
         return lex_dict
