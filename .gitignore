@@ -1,2 +1,19 @@
+# Ignorar pychache
+
 **/__pycache__/
 
+# Ignorar resultados del proyecto 2
+
+real_output/*
+
+output/*
+
+AUTOMATA_LR(0)/*
+
+# Ignorar resultados del proyecto 1
+
+log.txt
+
+expressions.json
+
+final_out_test.json
