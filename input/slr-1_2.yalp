@@ -12,7 +12,6 @@
 %token SEMICOLON 
 IGNORE ws
 
-
 general : general SEMICOLON expresion | expresion ; 
 
 expression:
