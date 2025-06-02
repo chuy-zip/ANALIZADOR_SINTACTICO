@@ -87,6 +87,7 @@ Diseño de Lenguajes de Programación
 print("Generador de analizador sintáctico")
 
 yalp_files = [
+    "input/slr-1_2.yalp",
     "input/slr-1.yalp",
     "input/slr-2.yalp",
     "input/slr-3.yalp",
