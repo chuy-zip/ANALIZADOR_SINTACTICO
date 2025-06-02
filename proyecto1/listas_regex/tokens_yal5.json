@@ -29,6 +29,11 @@
             "nombre": "RPAREN",
             "regex": "\\)",
             "lexema": ")"
+        },
+        {
+            "nombre": "SEMICOLON",
+            "regex": ";",
+            "lexema": ";"
         }
     ]
 }
