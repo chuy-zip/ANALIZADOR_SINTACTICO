@@ -1,5 +1,8 @@
 from ActionGotoTable import ActionGotoTable
 from first_follow import calculate_first, calculate_follow
+import logging
+import os
+import json
 
 class AutomataLR:
     def __init__(self, transition_table, original_grammar, augmented_start_symbol=None):
@@ -12,7 +15,28 @@ class AutomataLR:
         self.first_follow_table: dict = self.compute_first_follow()
         self.production_numbers = self.number_productions()
         self.action_goto_table: ActionGotoTable = self.build_action_goto_table()
+        self.setup_logging()
         
+
+    def setup_logging(self):
+        log_dir = "./output"
+        os.makedirs(log_dir, exist_ok=True)
+        
+        log_filename = f"{log_dir}/lr_parser_log.txt"
+        
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(log_filename, 'w', encoding='utf-8'),
+                logging.StreamHandler() 
+            ]
+        )
+        
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("=== INICIANDO ANÁLISIS SINTÁCTICO LR ===")
+        self.logger.info(f"Archivo de log: {log_filename}")
+
     def number_productions(self):
         productions_tuple = []
 
@@ -156,91 +180,166 @@ class AutomataLR:
     
     #Modulo 5
     def LR_parsing(self, token_iterator, lex_dict):
-        stack = [0]  # Pila de estados
-        token_buffer = []
-        
-        # Función para obtener el siguiente token
-        def get_next_token():
-            if token_buffer:
-                return token_buffer.pop(0)
+        def load_ignore_tokens():
+            ignore_file_path = "./real_output/ignore_tokens.json"
             try:
-                token = next(token_iterator)
-                simple_token = lex_dict.get(token["TokenName"])
-                return simple_token
-            except StopIteration:
-                return '$'  # Fin de entrada
+                with open(ignore_file_path, 'r', encoding='utf-8') as file:
+                    ignore_tokens = json.load(file)
+                    self.logger.info(f"Tokens a ignorar cargados: {ignore_tokens}")
+                    return set(ignore_tokens)
+            except FileNotFoundError:
+                self.logger.warning(f"Archivo {ignore_file_path} no encontrado. No se ignorarán tokens.")
+                return set()
+            except json.JSONDecodeError as e:
+                self.logger.error(f"Error al decodificar JSON en {ignore_file_path}: {e}")
+                return set()
+            except Exception as e:
+                self.logger.error(f"Error inesperado al cargar tokens a ignorar: {e}")
+                return set()
+        
+        ignore_tokens = load_ignore_tokens()
+        
+        self.logger.info("INICIANDO ANÁLISIS SINTÁCTICO LR")
+        
+        stack = [0]  
+        token_buffer = []
+        step_count = 0
+        
+        def get_next_token():
+            while True:
+                if token_buffer:
+                    token = token_buffer.pop(0)
+                    simple_token = lex_dict.get(token["TokenName"])
+                    
+                    if simple_token in ignore_tokens:
+                        self.logger.debug(f"🚫 Token ignorado: {simple_token} (valor: {token.get('Value', 'N/A')})")
+                        continue
+                    
+                    return simple_token
+                try:
+                    token = next(token_iterator)
+                    simple_token = lex_dict.get(token["TokenName"])
+                    
+                    if simple_token in ignore_tokens:
+                        self.logger.debug(f"🚫 Token ignorado: {simple_token} (valor: {token.get('Value', 'N/A')})")
+                        continue
+                    
+                    return simple_token
+                except StopIteration:
+                    return '$'
         
         current_token = get_next_token()
         
-        print(f"Iniciando parsing con primer token: {current_token}")
-        print(f"Estado inicial de la pila: {stack}")
+        self.logger.info(f"Primer token después de filtrar ignorados: {current_token}")
+        self.logger.info(f"Estado inicial de la pila: {stack}")
+        self.logger.info(f"Tokens configurados para ignorar: {ignore_tokens}")
+        
+        # Encabezado de la tabla de pasos
+        self.logger.info("\n" + "="*80)
+        self.logger.info("TABLA DE PASOS DEL ANÁLISIS SINTÁCTICO")
+        self.logger.info("="*80)
+        self.logger.info(f"{'Paso':<6} | {'Pila':<20} | {'Token':<15} | {'Acción':<20} | {'Descripción'}")
+        self.logger.info("-"*80)
         
         while True:
+            step_count += 1
             current_state = str(stack[-1])
-            print(f"\nEstado actual: {current_state}, Token actual: {current_token}")
-            print(f"Pila: {stack}")
+            
+            # Log del paso actual
+            stack_str = str(stack)
+            if len(stack_str) > 18:
+                stack_str = stack_str[:15] + "..."
             
             try:
                 action = self.action_goto_table.Action(current_state, current_token)
-                print(f"Acción encontrada: {action}")
                 
                 if action == "":
-                    print(f"Error sintáctico: No hay acción definida para estado {current_state} y token '{current_token}'")
+                    self.logger.info(f"{step_count:<6} | {stack_str:<20} | {current_token:<15} | {'ERROR':<20} | Estado: {current_state}")
+                    self.logger.error(f"ERROR SINTÁCTICO: No hay acción definida para estado {current_state} y token '{current_token}'")
+                    self.logger.error("Acciones válidas para este estado:")
+                    
+                    # Mostrar acciones válidas para debugging
+                    valid_actions = []
+                    for terminal in self.terminals.union({'$'}):
+                        try:
+                            valid_action = self.action_goto_table.Action(current_state, terminal)
+                            if valid_action != "":
+                                valid_actions.append(f"{terminal}: {valid_action}")
+                        except:
+                            continue
+                    
+                    if valid_actions:
+                        for valid_action in valid_actions:
+                            self.logger.error(f"   - {valid_action}")
+                    else:
+                        self.logger.error("   - No hay acciones válidas")
+                    
                     return False
                     
             except Exception as e:
-                print(f"Error al buscar acción: {e}")
+                self.logger.info(f"{step_count:<6} | {stack_str:<20} | {current_token:<15} | {'ERROR':<20} | Estado: {current_state}")
+                self.logger.error(f"Error al buscar acción: {e}")
                 return False
             
             if action == "acc":
-                print("Parsing completado exitosamente (ACCEPT)")
+                self.logger.info(f"{step_count:<6} | {stack_str:<20} | {current_token:<15} | {'ACCEPT':<20} | ✅ COMPLETADO")
+                self.logger.info("\n" + "="*80)
+                self.logger.info("ANÁLISIS SINTÁCTICO COMPLETADO EXITOSAMENTE")
+                self.logger.info("La cadena de entrada es SINTÁCTICAMENTE CORRECTA")
+                self.logger.info("="*80)
                 return True
                 
             elif action.startswith('s'):
                 new_state = int(action[1:])
                 stack.append(new_state)
+                action_desc = f"SHIFT -> {new_state}"
+                self.logger.info(f"{step_count:<6} | {stack_str:<20} | {current_token:<15} | {action_desc:<20} | Avanzar token")
                 current_token = get_next_token()
-                print(f"SHIFT: Moviendo a estado {new_state}, avanzando token")
                 
             elif action.startswith('r'):
                 production_num = int(action[1:])
                 
                 if production_num not in self.production_numbers:
-                    print(f"Error: Producción {production_num} no encontrada")
+                    self.logger.info(f"{step_count:<6} | {stack_str:<20} | {current_token:<15} | {'ERROR':<20} | Producción inexistente")
+                    self.logger.error(f"Error: Producción {production_num} no encontrada")
                     return False
                 
                 left_symbol, right_symbols = self.production_numbers[production_num]
                 production_length = len(right_symbols)
                 
-                print(f"REDUCE: Aplicando producción {production_num}: {left_symbol} -> {' '.join(right_symbols)}")
+                production_str = f"{left_symbol} -> {' '.join(right_symbols)}"
+                action_desc = f"REDUCE {production_num}"
+                self.logger.info(f"{step_count:<6} | {stack_str:<20} | {current_token:<15} | {action_desc:<20} | {production_str}")
                 
-                for _ in range(production_length):
+                # Hacer pop de la pila
+                for i in range(production_length):
                     if len(stack) <= 1:
-                        print(f"Error: Intento de hacer pop en pila vacía")
+                        self.logger.error(f"Error: Intento de hacer pop en pila vacía (iteración {i+1}/{production_length})")
                         return False
-                    stack.pop()
+                    popped = stack.pop()
+                    self.logger.debug(f"   Pop: {popped}")
                 
                 current_state_after_reduce = str(stack[-1])
                 
                 try:
                     goto_state = self.action_goto_table.Goto(current_state_after_reduce, left_symbol)
-                    print(f"GOTO: Desde estado {current_state_after_reduce} con {left_symbol} -> estado {goto_state}")
                     
                     if goto_state == "":
-                        print(f"Error sintáctico: No hay GOTO definido para estado {current_state_after_reduce} y no terminal '{left_symbol}'")
+                        self.logger.error(f"Error sintáctico: No hay GOTO definido para estado {current_state_after_reduce} y no terminal '{left_symbol}'")
                         return False
                     
                     stack.append(int(goto_state))
+                    self.logger.debug(f"   GOTO: Estado {current_state_after_reduce} + {left_symbol} -> Estado {goto_state}")
                     
                 except Exception as e:
-                    print(f"Error al buscar GOTO: {e}")
+                    self.logger.error(f"Error al buscar GOTO: {e}")
                     return False
             
             else:
-                print(f"Error: Acción desconocida '{action}'")
+                self.logger.info(f"{step_count:<6} | {stack_str:<20} | {current_token:<15} | {'ERROR':<20} | Acción desconocida")
+                self.logger.error(f"Error: Acción desconocida '{action}'")
                 return False
 
-    #Obtiene las transiciones para un estado dado del autómata.
     def get_state_transitions(self, state):
         return self.automata_table[state]["transitions"]
 
