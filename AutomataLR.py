@@ -19,9 +19,9 @@ class AutomataLR:
         
 
     def setup_logging(self):
-        log_dir = "./output"
+        log_dir = "./real_output"
         os.makedirs(log_dir, exist_ok=True)
-        
+
         log_filename = f"{log_dir}/lr_parser_log.txt"
         
         logging.basicConfig(
@@ -197,6 +197,9 @@ class AutomataLR:
             except Exception as e:
                 self.logger.error(f"Error inesperado al cargar tokens a ignorar: {e}")
                 return set()
+
+        with open("./real_output/lr_parser_log.txt", 'w', encoding='utf-8') as f:
+            f.write("")
         
         ignore_tokens = load_ignore_tokens()
         
