@@ -87,11 +87,11 @@ Diseño de Lenguajes de Programación
 print("Generador de analizador sintáctico")
 
 yalp_files = [
-    "input/slr-1_2.yalp",
     "input/slr-1.yalp",
     "input/slr-2.yalp",
     "input/slr-3.yalp",
-    "input/slr-4.yalp"
+    "input/slr-4.yalp",
+    "input/slr-1_2.yalp",
 ]
 
 print("Elige un archivo seleccinando el numero correspondiente:")
@@ -159,8 +159,7 @@ while True:
                 f"1) Procesar archivo: {files[0]}\n" + \
                 f"2) Procesar archivo: {files[1]}\n" + \
                 f"3) Procesar archivo: {files[2]}\n" + \
-                "4) Ingresar texto manual\n" + \
-                "5) Salir\n"
+                "4) Salir\n"
 
     print(menu_text)
 
@@ -190,19 +189,6 @@ while True:
         # tokens_str = json.dumps(tokens, indent=4)
 
     elif choice == '4':
-        manual_text_msg = "\n== Ingresar texto manual ==\n"
-        print(manual_text_msg)
-
-        input_text = input("Escribe el texto que deseas procesar:\n> ")
-
-        tokens = process_file(input_text, start_node, token_names, False)
-
-        #with open('tokens_manual.json', 'w') as json_file:
-        #    json.dump(tokens, json_file, indent=4)
-        #
-        #tokens_str = json.dumps(tokens, indent=4)
-
-    elif choice == '5':
         exit_msg = "\nSaliendo del programa. ¡Hasta luego!\n"
         break
 
