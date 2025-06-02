@@ -29,7 +29,7 @@ class AutomataLR:
             format='%(asctime)s - %(levelname)s - %(message)s',
             handlers=[
                 logging.FileHandler(log_filename, 'w', encoding='utf-8'),
-                logging.StreamHandler() 
+                #logging.StreamHandler() 
             ]
         )
         
