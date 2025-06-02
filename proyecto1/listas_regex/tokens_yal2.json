@@ -3,7 +3,7 @@
         {
             "nombre": "WHITESPACE",
             "regex": "( |\t|\n)+",
-            "lexema": "ws"
+            "lexema": "WHITESPACE"
         },
         {
             "nombre": "ID",
@@ -44,6 +44,11 @@
             "nombre": "RPAREN",
             "regex": "\\)",
             "lexema": ")"
+        },
+        {
+            "nombre": "SEMICOLON",
+            "regex": ";",
+            "lexema": ";"
         }
     ]
 }
