@@ -150,8 +150,11 @@ for fmt in formats:
 
 files = [
     "input_to_parse/inputTest.txt",
+    "input_to_parse/test_yalp1.txt",
     "input_to_parse/numbers_expressions.txt",
-    "input_to_parse/variable_expressions.txt"
+    "input_to_parse/variable_expressions.txt",
+    "input_to_parse/test_yalp3.txt",
+    "input_to_parse/test_yalp4.txt",
 ]
 
 while True:
@@ -159,13 +162,16 @@ while True:
                 f"1) Procesar archivo: {files[0]}\n" + \
                 f"2) Procesar archivo: {files[1]}\n" + \
                 f"3) Procesar archivo: {files[2]}\n" + \
-                "4) Salir\n"
+                f"4) Procesar archivo: {files[3]}\n" + \
+                f"5) Procesar archivo: {files[4]}\n" + \
+                f"6) Procesar archivo: {files[5]}\n" + \
+                "7) Salir\n"
 
     print(menu_text)
 
     choice = input("Elige una opción: ")
 
-    if choice in ['1', '2', '3']:
+    if choice in ['1', '2', '3', '4', '5', '6']:
         index = int(choice) - 1
         file_path = files[index]
 
@@ -188,7 +194,7 @@ while True:
 
         # tokens_str = json.dumps(tokens, indent=4)
 
-    elif choice == '4':
+    elif choice == '7':
         exit_msg = "\nSaliendo del programa. ¡Hasta luego!\n"
         break
 
